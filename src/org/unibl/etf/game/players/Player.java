@@ -4,24 +4,32 @@ import java.awt.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
 
 
+import org.unibl.etf.game.cards.Deck;
 import org.unibl.etf.game.figures.*;
+import org.unibl.etf.shape.Diamond;
+import org.unibl.etf.shape.DiamondShape;
+import org.unibl.etf.shape.Hole;
 import org.unibl.etf.tools.*;
+import static sample.Game.playField;
 
-public class Player {
+public class Player extends Thread implements Serializable {
     public static final Set<String> names=new HashSet<String>();
     private String name;
     private static Integer idCounter = 1;
-    private List<Figure> figures=new ArrayList<Figure>();
+    private List<Figure> figures;
     private int numOfFigures=0,uniqueID;
     private Color color;
-    private boolean isPlayerInTheGame;
+    private boolean isPlayerInTheGame=true;
+    private  DiamondShape d;
 
-    static
+
+  /*  static
     {
         try {
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("IGRA_"+ LocalDate.now()+".txt"));
@@ -31,10 +39,11 @@ public class Player {
         catch (IOException ioException){
             GenLogger.log(Player.class, ioException);
         }
-    }
+    }*/
 
-    public Player(String name) throws Exception
+    public Player(String name, DiamondShape d) throws Exception
     {
+        this.d=d;
         if (!names.add(name))
             throw new UnavaliableNameException();
         this.name = name;
@@ -57,14 +66,35 @@ public class Player {
             idCounter = 1;
         }
 
+        figures=new ArrayList<>(4);
+        Random random=new Random();
+
+        extracted(random);
+
         //dodaj figure i uvecaj im broj igracu
     }
 
-    public String getName() {
+    private void extracted(Random random) {
+        int rand;
+        for(int i = 0; i<4; i++)
+        {
+            rand = random.nextInt(4);
+            if(rand ==1)
+                figures.add(new OrdinaryFigure(d,this));
+            else if(rand ==2)
+                figures.add(new LevitatingFigure(d,this));
+            else if(rand ==3)
+                figures.add(new SuperFastFigure(d,this));
+            else if(rand==0)
+                i--;
+        }
+    }
+
+    public String getPlayersName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setPlayersName(String name) {
         this.name = name;
     }
 
@@ -128,5 +158,21 @@ public class Player {
     @Override
     public String toString() {
         return "Igrac "+uniqueID+" - "+name;
+    }
+
+    @Override
+    public void run()
+    {
+                try {
+                    getFigures().get(0).start();
+
+                    getFigures().get(0).join();
+                    getFigures().get(1).start();
+
+
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
     }
 }

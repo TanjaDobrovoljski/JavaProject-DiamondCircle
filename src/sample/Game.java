@@ -14,9 +14,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URL;
+import java.util.ArrayList;
 
+import org.unibl.etf.game.cards.Card;
+import org.unibl.etf.game.cards.Deck;
 import org.unibl.etf.game.cards.OrdinaryCard;
 import org.unibl.etf.game.cards.SpecialCard;
+import org.unibl.etf.game.players.Player;
 import org.unibl.etf.shape.*;
 import org.unibl.etf.game.figures.*;
 
@@ -32,7 +36,7 @@ public class Game extends JFrame implements Serializable {
     private JLabel title;
     private JButton button1;
     private JScrollPane figuresList;
-    private JPanel imagePanel;
+    private  JPanel imagePanel;
    // private JTable matrix;
 
     private JPanel middle;
@@ -41,7 +45,7 @@ public class Game extends JFrame implements Serializable {
     public static JPanel playField;
 
 
-    public Game() throws IOException {
+    public Game() throws Exception {
         super();
         setContentPane(mainPanel);
         setVisible(true);
@@ -51,40 +55,30 @@ public class Game extends JFrame implements Serializable {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         playField=middle;
         DiamondShape d=new DiamondShape();
+        Deck deck=new Deck();
+        // Arrays.stream(DiamondShape.getButtons()).flatMap(Arrays::stream).forEach(x -> x.removeAll());  brise sve
 
-
-
-
-        slika();
 
         Diamond dd = new Diamond(0, 0);
-        OrdinaryCard o=new OrdinaryCard(1);
 
 
-       /* int[][] counts;                             //integer array to store counts of each cell. Used as a back-end for comparisons.
-        JButton[][] buttons;
-        middle.setLayout(new GridLayout(5,5));
-        buttons = new JButton[5][5];
+       Player p=new Player("Simo",d);
+        p.start();
 
-        for(int a = 0; a < buttons.length; a++)
-        {
-            for(int b = 0; b < buttons[0].length; b++)
-            {
-                buttons[a][b] = new JButton();
-
-                middle.add(buttons[a][b]);
-            }
-        }
-        */
-
-
+       // d.removeDiamondsAndHoles();
 
     }
 
-    public void slika() throws IOException {
+    public  void slika( Card s) throws IOException {
        imagePanel.setLayout(new FlowLayout());
-        SpecialCard s=new SpecialCard();
-        BufferedImage myPicture = ImageIO.read(new File(s.getSlika()));
+        BufferedImage myPicture=null;
+        if(s instanceof OrdinaryCard)
+        myPicture = ImageIO.read(new File(s.getSlika()));
+        else if(s instanceof SpecialCard)
+        {
+            myPicture = ImageIO.read(new File(s.getSlika()));
+            ((SpecialCard) s).setHoles();
+        }
         JLabel picLabel = new JLabel(new ImageIcon(myPicture));
         imagePanel.add(picLabel);
   }

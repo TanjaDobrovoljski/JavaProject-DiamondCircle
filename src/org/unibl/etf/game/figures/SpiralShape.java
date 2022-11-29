@@ -24,8 +24,8 @@ public class SpiralShape extends JPanel {
         int y = 7;
 
         // fill and stroke GeneralPath
-        int xPoints[] = {x, 60, x, 60};
-        int yPoints[] = {y, 60, 60, y};
+        int xPoints[] = {x, 40, x, 40};
+        int yPoints[] = {y, 40, 40, y};
         GeneralPath filledPolygon = new GeneralPath(GeneralPath.WIND_EVEN_ODD,
                 xPoints.length);
         filledPolygon.moveTo(xPoints[0], yPoints[0]);

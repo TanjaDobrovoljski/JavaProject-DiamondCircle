@@ -2,6 +2,7 @@ package org.unibl.etf.game.figures;
 
 
 import org.unibl.etf.game.cards.Deck;
+import org.unibl.etf.game.players.Player;
 import org.unibl.etf.shape.DiamondShape;
 import org.unibl.etf.tools.GenLogger;
 import org.unibl.etf.tools.Tuple;
@@ -14,115 +15,111 @@ import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 
-
+import static sample.Game.playField;
 
 public class Figure extends Thread  implements Serializable {
-    private static Integer idCounter = 1,uniqueID;
-    private static int Id=1;
-
-    protected boolean hasDiamond,alive;
+    private static Integer idCounter = 1;
+    private int uniqueID;
+    protected boolean alive;
     protected static List<Tuple<Integer, Integer>> futureMovements,passedMovements;
     protected  int numberOfMoves=1;
     protected int numOfDiamonds;
-    private Color color ;
-    protected DiamondShape dS;
-    private Deck gameDeck;
+    protected Player player;
+    private DiamondShape d;
 
-
-    public Figure()
-    {
-        uniqueID=idCounter++;
-
-
-        this.numOfDiamonds=0;
-        this.hasDiamond=false;
-        this.alive=true;
-
+    public static Integer getIdCounter() {
+        return idCounter;
     }
 
-    public Figure(DiamondShape ds, Deck deck)
-    {
+    public static void setIdCounter(Integer idCounter) {
+        Figure.idCounter = idCounter;
+    }
 
+    public Integer getUniqueID() {
+        return uniqueID;
+    }
+
+    public void setUniqueID(Integer uniqueID) {
+        this.uniqueID = uniqueID;
+    }
+
+
+
+    public void setAlive(boolean alive) {
+        this.alive = alive;
+    }
+
+    public DiamondShape getD() {
+        return d;
+    }
+
+    public void setD(DiamondShape d) {
+        this.d = d;
+    }
+
+    public int getNumberOfMoves() {
+        return numberOfMoves;
+    }
+
+    public void setNumberOfMoves(int numberOfMoves) {
+        this.numberOfMoves = numberOfMoves;
+    }
+
+    public int getNumOfDiamonds() {
+        return numOfDiamonds;
+    }
+
+    public void setNumOfDiamonds(int numOfDiamonds) {
+        this.numOfDiamonds = numOfDiamonds;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
+    public String getFigureName() {
+        return figureName;
+    }
+
+    public void setFigureName(String figureName) {
+        this.figureName = figureName;
+    }
+
+
+
+
+    public boolean isFIgureAlive() {
+        return alive;
+    }
+
+
+    protected String figureName;
+
+    public Figure(DiamondShape d,Player p)
+    {
+        uniqueID=idCounter++;
+        figureName="Figura "+idCounter;
         this.numOfDiamonds=0;
-        this.hasDiamond=false;
-        this.dS=ds;
-        this.gameDeck=deck;
         this.alive=false;
-        futureMovements=(DiamondShape.random) % 2 == 0 ? ds.getMovementsEven() : dS.getMovementsOdd();
+        this.player=p;
+        this.d=d;
+        futureMovements=d.getmovements();
         passedMovements=new ArrayList<>();
 
     }
 
-    static int k=0;
-    /*@Override
+    @Override
     public  void  run()
     {
-        for (int i = 0; i < Figure.getFutureMovements().size(); i++)
-        {
-            try {
-                Platform.runLater(() -> {
-                    DiamondShape.drawMatrix( futureMovements.get(k).getItem1(),futureMovements.get(k).getItem2() );
-                    passedMovements.add(futureMovements.get(k));
-                    k++;
-
-                });
-
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-            }
-            catch(Exception e){
-                e.printStackTrace();
-            }
-        }
-
-    }
-
-    public void moveFigure()
-    {
-        synchronized (this) {
-            for (int i = 0; i < Figure.getFutureMovements().size(); i++)
-            {
-                try {
-                    Platform.runLater(() -> {
-                        DiamondShape.drawMatrix( futureMovements.get(k).getItem1(),futureMovements.get(k).getItem2() );
-                        passedMovements.add(futureMovements.get(k));
-                        k++;
-
-                    });
-
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                catch(Exception e){
-                    e.printStackTrace();
-                }
-            }
-            alive=false;
-
-        }
-    }
-*/
-
-    public   Color getColor() {
-        return color;
-    }
-
-    public  void setColor(Color color) {
-        this.color = color;
-    }
-
-    public boolean isHasDiamond() {
-        return hasDiamond;
-    }
-
-    public void setHasDiamond(boolean hasDiamond) {
-        this.hasDiamond = hasDiamond;
     }
 
     public static List<Tuple<Integer, Integer>> getFutureMovements() {

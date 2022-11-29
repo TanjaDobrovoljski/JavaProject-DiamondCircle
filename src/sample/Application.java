@@ -35,6 +35,8 @@ public class Application  {
                    new Game();
                } catch (IOException e) {
                    e.printStackTrace();
+               } catch (Exception e) {
+                   e.printStackTrace();
                }
 
         });

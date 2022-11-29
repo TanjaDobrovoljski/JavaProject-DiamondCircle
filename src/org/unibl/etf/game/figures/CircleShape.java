@@ -7,12 +7,11 @@ import java.awt.geom.Ellipse2D;
 
 public class CircleShape extends JPanel {
 
-
     // class paint to fill color in circle.
     public void paint(Graphics g)
     {
-        int width = 50;
-        int height = 50;
+        int width = 30;
+        int height =30;
         int diameter = Math.min(width, height);
         int x = (width - diameter) / 2;
         int y = (height - diameter) / 2;

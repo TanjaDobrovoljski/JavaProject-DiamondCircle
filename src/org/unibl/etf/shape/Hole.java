@@ -1,19 +1,22 @@
 package org.unibl.etf.shape;
 
+import javax.swing.*;
+
 import static sample.Game.playField;
 import java.awt.*;
 import java.io.File;
 
-public class Hole {
+public class Hole extends JPanel {
     private Integer positionX;
     private Integer positionY;
     private static File file=new File("src/sample");
     private String image;
-
+    private Image im;
 
     public Hole()
     {
         image=file.getAbsolutePath()+"\\hole.png";
+        this.im=new ImageIcon(image).getImage();
 
     }
 
@@ -22,7 +25,13 @@ public class Hole {
         this.positionX=x;
         this.positionY=y;
         image=file.getAbsolutePath()+"\\hole.png";
+        this.im=new ImageIcon(image).getImage();
 
+    }
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g); // paint the background image and scale it to fill the entire space
+        g.drawImage(im,0,0,null);
     }
 
     public String getImage() {

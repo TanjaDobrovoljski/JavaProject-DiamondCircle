@@ -1,6 +1,7 @@
 package org.unibl.etf.game.figures;
 
 import org.unibl.etf.game.cards.Deck;
+import org.unibl.etf.game.players.Player;
 import org.unibl.etf.shape.Diamond;
 import org.unibl.etf.shape.DiamondShape;
 import org.unibl.etf.tools.Tuple;
@@ -23,9 +24,9 @@ public class GhostFigure extends Figure{
     private Set<Diamond> list=new HashSet<Diamond>();
 
 
-    public GhostFigure(DiamondShape ds, Deck deck)
+    public GhostFigure(DiamondShape d, Player p)
     {
-        super(ds,deck);
+        super(d,p);
         this.matrixDimension=DiamondShape.random;
         Random random = new Random();
         rand = 0;

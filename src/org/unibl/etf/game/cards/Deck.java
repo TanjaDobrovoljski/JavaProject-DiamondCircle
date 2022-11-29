@@ -1,15 +1,18 @@
 package org.unibl.etf.game.cards;
 
+import org.unibl.etf.tools.CircularArrayList;
 
-
+import java.nio.Buffer;
 import java.util.*;
 
 public class Deck {
-    private LinkedList<Card> deck;
+    private static CircularArrayList<Card> deck;
+    private Buffer buf;
+    private static int numofDraw=0;
 
     public Deck()
     {
-        deck=new LinkedList<>();
+        deck=new CircularArrayList<Card>(52);
         for (int i=0;i<10;i++) {
             deck.add(new OrdinaryCard(1));
             deck.add(new OrdinaryCard(2));
@@ -21,27 +24,21 @@ public class Deck {
         deck.add(new SpecialCard());
 
         Collections.shuffle(deck);
-
     }
 
-    public LinkedList<Card> getDeck() {
+    public CircularArrayList<Card> getDeck() {
         return deck;
     }
 
-    public void setDeck(LinkedList<Card> deck) {
+    public void setDeck(CircularArrayList<Card> deck) {
         this.deck = deck;
     }
 
- /*private Node head;
-
-    public Node getHeadNode() {
-        return this.head;
+    public synchronized static Card drawCard()
+    {
+        Card tmp=deck.get(numofDraw);
+        numofDraw++;
+        System.out.println(deck.capacity()+" velicina");
+        return tmp;
     }
-    public class Node {
-        private int data;
-        private Node next;
-        //constructor
-        public Node(int data) { this.data = data; this.next = null; }
-    }*/
-
 }

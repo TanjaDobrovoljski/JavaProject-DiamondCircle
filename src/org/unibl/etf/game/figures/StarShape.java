@@ -22,7 +22,7 @@ public class StarShape extends JPanel
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         int width = getWidth();
         int height = getHeight();
-        int size = Math.min(width, height) / 2;
+        int size = Math.min(width, height) / 3;
         int x = width / 2;
         int y = height / 2;
         Star2D s = new Star2D(x, y, size / 2, size, 5);

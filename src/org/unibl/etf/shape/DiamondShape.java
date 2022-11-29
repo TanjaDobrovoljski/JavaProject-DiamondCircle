@@ -9,6 +9,11 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.unibl.etf.game.figures.Figure;
+import org.unibl.etf.game.figures.LevitatingFigure;
+import org.unibl.etf.game.figures.OrdinaryFigure;
+import org.unibl.etf.game.figures.SuperFastFigure;
 import org.unibl.etf.tools.*;
 
 import javax.swing.*;
@@ -21,14 +26,22 @@ import static sample.Game.playField;
 
 
 public class DiamondShape implements Serializable {
-   private  JButton[][] buttons;
-    private  List<Tuple<Integer, Integer>> movementsOdd; //neparni
-    private  List<Tuple<Integer, Integer>> movementsEven; //parni
+   private static JButton[][] buttons;
+    private static List<Tuple<Integer, Integer>> movementsOdd; //neparni
+    private static List<Tuple<Integer, Integer>> movementsEven; //parni
     private static int matrixSize;
     public static int random=0;
-    private static int movementSize=0;
+    private  int movementSize=0;
 
-    public JButton[][] getButtons() {
+    public static List<Tuple<Integer, Integer>> movements()
+    {
+        if (random%2==0)
+            return movementsEven;
+        else
+            return movementsOdd;
+    }
+
+    public static JButton[][] getButtons() {
         return buttons;
     }
 
@@ -47,14 +60,14 @@ public class DiamondShape implements Serializable {
 
         if(random==0)
             random=(int)Math.floor(Math.random()*(max-min+1)+min);
-        random=7;
+
         playField.setLayout(new GridLayout(random,random));
 
         buttons = new JButton[random][random];
 
         int k=1;
-        for (int y = 0; y < random; y++) {
-            for (int x = 0; x < random; x++) {
+        for (int x = 0; x < random; x++) {
+            for (int y = 0; y < random; y++) {
 
                 // Create a new TextField in each Iteration
                 JTextField tf = new JTextField();
@@ -63,7 +76,7 @@ public class DiamondShape implements Serializable {
                 tf.setEditable(false);
                 buttons[x][y] = new JButton();
                 buttons[x][y].setText(tf.getText());
-                //buttons[x][y].setEnabled(false);
+                buttons[x][y].setEnabled(false);
                 buttons[x][y].setPreferredSize(new Dimension(100,100));
                 playField.add(buttons[x][y]);
                 k++;
@@ -217,33 +230,6 @@ public class DiamondShape implements Serializable {
 
     }
 
-   /* public static TextField getNodeByRowColumnIndex(final int row, final int column, GridPane gridPane) {
-        Node result = null;
-        ObservableList<Node> childrens = gridPane.getChildren();
-        for(Node node : childrens) {
-            if(gridPane.getRowIndex(node) == row && gridPane.getColumnIndex(node) == column) {
-                result = node;
-                break;
-            }
-        }
-        return (TextField) result;
-    }
-
-   /* public boolean hasDiamond( int row,  int column, GridPane gridPane) {
-        Node result = null;
-        ObservableList<Node> childrens = gridPane.getChildren();
-        for(Node node : childrens) {
-            if(gridPane.getRowIndex(node) == row && gridPane.getColumnIndex(node) == column) {
-
-                result = node;
-                break;
-            }
-        }
-        return (TextField) result;
-    }*/
-
-
-
 
     public void diamondSpiral()
     {
@@ -270,57 +256,42 @@ public class DiamondShape implements Serializable {
 
     }
 
-    public static int getMovementSize() {
+    public  int getMovementSize() {
         return movementSize;
     }
 
-    public static void setMovementSize(int movementSize) {
-        DiamondShape.movementSize = movementSize;
+    public  void setMovementSize(int movementSize) {
+        this.movementSize = movementSize;
     }
 
+    public synchronized  void drawMatrix(Figure f,int x,int y) {
+        if ( f instanceof OrdinaryFigure)
+            buttons[x][y].add(((OrdinaryFigure) f).getShape());
+        else if ( f instanceof LevitatingFigure)
+            buttons[x][y].add(((LevitatingFigure) f).getShape());
+        else if ( f instanceof SuperFastFigure)
+            buttons[x][y].add(((SuperFastFigure) f).getShape());
+        playField.revalidate();
+        playField.repaint();
+    }
 
-
-   /* private static int c=0;
-    public static  void addCirclesToGridPane(List<Ellipse2D> circles, int a, int b) //dodavanje figura kao krugova
+    public void removeDiamonds() //refresh za duh figuru (uklanjanje dijamanata)
     {
-        playField.add(circles.get(c), b,a);
-        c++;
-    }*/
+        var list=buttons;
+        for (var i: list) {
+            for (var k:i) {
+               var list2= k.getComponents();
+               for (var m:list2)
+               {
 
-    /*public static synchronized void drawMatrix(int xCoordinate,int yCoordinate)
-    {
-        //playField.getChildren().clear();
-        int k=1;
-        for (int y = 0; y < random; y++) {
-            for (int x = 0; x < random; x++) {
+                   if (m instanceof Diamond)
+                   { playField.remove(m);
+                       k.remove(m);
 
-                // Create a new TextField in each Iteration
-                TextField tf = new TextField();
-                tf.setPrefHeight(170);
-                tf.setPrefWidth(170);
-                tf.setAlignment(Pos.CENTER);
-                tf.setEditable(true);
-                tf.setText(String.valueOf(k));
-                playField.setRowIndex(tf, y);
-                playField.setColumnIndex(tf, x);
-                playField.add(tf, x, y);
-                k++;
+                   }
+               }
             }
         }
-        playField.add(circles.get(0),yCoordinate,xCoordinate);
-        c=0;
-
-    }*/
-
-
-    /*private static int r=0;
-    public void addRectangleToGridPane(JTable gridPane, Graphics g,int a, int b) //dodavanje rupa
-    {
-        gridPane.add(g.drawRect(50, 35, 150, 150),a,b);
-        r++;
-
-    }*/
-
-
+    }
 
 }
