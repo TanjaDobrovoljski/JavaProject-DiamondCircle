@@ -2,18 +2,25 @@ package org.unibl.etf.game.cards;
 
 import org.unibl.etf.tools.CircularArrayList;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.nio.Buffer;
 import java.util.*;
 
 public class Deck {
     private static CircularArrayList<Card> deck;
     private Buffer buf;
-    private static int numofDraw=0;
+    private int numofDraw = 0;
 
-    public Deck()
-    {
-        deck=new CircularArrayList<Card>(52);
-        for (int i=0;i<10;i++) {
+
+    public Deck() {
+
+        deck = new CircularArrayList<Card>(52);
+        for (int i = 0; i < 10; i++) {
             deck.add(new OrdinaryCard(1));
             deck.add(new OrdinaryCard(2));
             deck.add(new OrdinaryCard(3));
@@ -34,11 +41,14 @@ public class Deck {
         this.deck = deck;
     }
 
-    public synchronized static Card drawCard()
-    {
-        Card tmp=deck.get(numofDraw);
+    public  int drawCard() throws IOException {
+        if (numofDraw == deck.capacity())
+            numofDraw = 0;
+        Card tmp = deck.get(numofDraw);
         numofDraw++;
-        System.out.println(deck.capacity()+" velicina");
-        return tmp;
+        if (tmp instanceof  OrdinaryCard)
+        return ((OrdinaryCard) tmp).getNumOfFields();
+        else
+            return 0;
     }
 }

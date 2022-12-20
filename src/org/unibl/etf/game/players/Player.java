@@ -17,6 +17,7 @@ import org.unibl.etf.shape.DiamondShape;
 import org.unibl.etf.shape.Hole;
 import org.unibl.etf.tools.*;
 import static sample.Game.playField;
+import static sample.Game.playingDeck;
 
 public class Player extends Thread implements Serializable {
     public static final Set<String> names=new HashSet<String>();
@@ -25,8 +26,9 @@ public class Player extends Thread implements Serializable {
     private List<Figure> figures;
     private int numOfFigures=0,uniqueID;
     private Color color;
-    private boolean isPlayerInTheGame=true;
+    private boolean isPlayerInTheGame=true,turn=true;
     private  DiamondShape d;
+
 
 
   /*  static
@@ -44,6 +46,7 @@ public class Player extends Thread implements Serializable {
     public Player(String name, DiamondShape d) throws Exception
     {
         this.d=d;
+
         if (!names.add(name))
             throw new UnavaliableNameException();
         this.name = name;
@@ -78,7 +81,8 @@ public class Player extends Thread implements Serializable {
         int rand;
         for(int i = 0; i<4; i++)
         {
-            rand = random.nextInt(4);
+            //rand = random.nextInt(4);
+            rand=1;
             if(rand ==1)
                 figures.add(new OrdinaryFigure(d,this));
             else if(rand ==2)
@@ -160,19 +164,53 @@ public class Player extends Thread implements Serializable {
         return "Igrac "+uniqueID+" - "+name;
     }
 
+    static int figureNumber=0;
     @Override
     public void run()
     {
-                try {
-                    getFigures().get(0).start();
+       /* if (!turn)
+            try {
+                wait();
+            } catch (Exception ex) {
+                System.out.println("Izuzetak!");
+            }
+    else{*/
+       // GhostFigure g=new GhostFigure(d,this);
+        //g.start();
 
-                    getFigures().get(0).join();
-                    getFigures().get(1).start();
+        try {
+           /* for (Figure f:figures
+                 ) {
+                f.setAlive(true);
+                System.out.println("da li je red "+f.isTurn());
+                f.start();
+
+                */
+            Figure f=figures.get(figureNumber);
+
+            f.start();
+
+            while(f.isAlive())
+            { synchronized(f){
+
+                    { try{
+
+                        System.out.println("Waiting for "+f.getUniqueID()+" to complete...");
+                        System.out.println("da li je red "+f.isTurn());
+                        f.wait();
+
+                    }catch(InterruptedException e){
+                        e.printStackTrace();
+                    }}
 
 
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
                 }
-    }
-}
+            }
+            figureNumber++;
+                System.out.println("u petlji figura");
+            } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }}
+
+

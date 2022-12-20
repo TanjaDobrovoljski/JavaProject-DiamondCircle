@@ -28,7 +28,7 @@ public class SpecialCard extends Card{
         }
     }
 
-    public void removeHoles() //refresh za duh figuru (uklanjanje dijamanata)
+    public void removeHoles() //(uklanjanje rupa)
     {
         var list=DiamondShape.getButtons();
         for (var i: list) {

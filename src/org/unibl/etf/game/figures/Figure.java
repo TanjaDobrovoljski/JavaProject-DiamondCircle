@@ -20,11 +20,21 @@ import static sample.Game.playField;
 public class Figure extends Thread  implements Serializable {
     private static Integer idCounter = 1;
     private int uniqueID;
-    protected boolean alive;
-    protected static List<Tuple<Integer, Integer>> futureMovements,passedMovements;
+    protected boolean alive,turn=false;
+    protected static List<Tuple<Integer, Integer>> futureMovements;
+    protected  List<Tuple<Integer, Integer>> passedMovements;
     protected  int numberOfMoves=1;
     protected int numOfDiamonds;
     protected Player player;
+
+    public boolean isTurn() {
+        return turn;
+    }
+
+    public void setTurn(boolean turn) {
+        this.turn = turn;
+    }
+
     private DiamondShape d;
 
     public static Integer getIdCounter() {
@@ -130,12 +140,12 @@ public class Figure extends Thread  implements Serializable {
         Figure.futureMovements = futureMovements;
     }
 
-    public static List<Tuple<Integer, Integer>> getPassedMovements() {
+    public  List<Tuple<Integer, Integer>> getPassedMovements() {
         return passedMovements;
     }
 
-    public static void setPassedMovements(List<Tuple<Integer, Integer>> passedMovements) {
-        Figure.passedMovements = passedMovements;
+    public  void setPassedMovements(List<Tuple<Integer, Integer>> passedMovements) {
+        this.passedMovements = passedMovements;
     }
 
     public int getNumOfDiamons() {

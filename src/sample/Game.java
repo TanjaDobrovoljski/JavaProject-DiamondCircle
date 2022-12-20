@@ -43,6 +43,7 @@ public class Game extends JFrame implements Serializable {
 
 
     public static JPanel playField;
+    public static Deck playingDeck;
 
 
     public Game() throws Exception {
@@ -56,27 +57,24 @@ public class Game extends JFrame implements Serializable {
         playField=middle;
         DiamondShape d=new DiamondShape();
         Deck deck=new Deck();
+        playingDeck=deck;
         // Arrays.stream(DiamondShape.getButtons()).flatMap(Arrays::stream).forEach(x -> x.removeAll());  brise sve
 
 
         Diamond dd = new Diamond(0, 0);
 
-
        Player p=new Player("Simo",d);
         p.start();
 
-       // d.removeDiamondsAndHoles();
 
     }
 
-    public  void slika( Card s) throws IOException {
+    public void slika( Card s) throws IOException {
        imagePanel.setLayout(new FlowLayout());
         BufferedImage myPicture=null;
-        if(s instanceof OrdinaryCard)
         myPicture = ImageIO.read(new File(s.getSlika()));
-        else if(s instanceof SpecialCard)
+        if(s instanceof SpecialCard)
         {
-            myPicture = ImageIO.read(new File(s.getSlika()));
             ((SpecialCard) s).setHoles();
         }
         JLabel picLabel = new JLabel(new ImageIcon(myPicture));

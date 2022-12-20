@@ -7,8 +7,10 @@ import java.awt.geom.Ellipse2D;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.unibl.etf.game.figures.Figure;
 import org.unibl.etf.game.figures.LevitatingFigure;
@@ -294,4 +296,8 @@ public class DiamondShape implements Serializable {
         }
     }
 
+    public Component checkField(int x,int y)
+    {
+        return buttons[x][y].getComponent(0);
+    }
 }

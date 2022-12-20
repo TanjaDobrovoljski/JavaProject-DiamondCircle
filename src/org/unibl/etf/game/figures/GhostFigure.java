@@ -28,13 +28,6 @@ public class GhostFigure extends Figure{
     {
         super(d,p);
         this.matrixDimension=DiamondShape.random;
-        Random random = new Random();
-        rand = 0;
-        while (true){
-            rand = random.nextInt(matrixDimension);
-            if(rand >= 2 && rand<= matrixDimension) break;
-        }
-
     }
 
     public Set<Diamond> getList() {
@@ -45,43 +38,43 @@ public class GhostFigure extends Figure{
         this.list = list;
     }
 
-    public void playGhost(DiamondShape ds)
+    public void playGhost()
     {
+        Random random = new Random();
+        rand = 0;
+        while (true){
+            rand = random.nextInt(matrixDimension);
+            if(rand >= 2 && rand<= matrixDimension) break;
+        }
         int tmpRand=rand;
-        List<Tuple<Integer, Integer>> temp=ds.getmovements();
+        List<Tuple<Integer, Integer>> temp=this.getD().getmovements();
         while(tmpRand>0)
         {
             Tuple<Integer,Integer> element = temp.get(new Random().nextInt(temp.size()));
 
             try {
-                temp.remove(element);
                 list.add(new Diamond(element.getItem1(), element.getItem2()));
                 tmpRand--;
             } catch (NullPointerException ex) {
                 ex.printStackTrace();
             }
         }
-       /* for (Diamond d:list) {
-            ImageView imageView=new ImageView();
-            Image imProfile = new Image(d.getLogo()); //ucitavanje slike
-            imageView.setImage(imProfile);
-            imageView.setFitHeight(40);
-            imageView.setFitWidth(40);
-            playField.add(imageView,d.getxCoordinate(),d.getyCoordinate());
-        }
-*/
+       list.stream().forEach(diamond -> DiamondShape.getButtons()[diamond.getPositionX()][diamond.getPositionY()].add(diamond));
+        list.clear();
     }
 
-    /*@Override
+    @Override
     public  void  run() {
-
-        Platform.runLater(() -> {
-            playGhost(dS);
-            try{
-                sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        while(true)
+        {
+            try {
+                playGhost();
+                System.out.println("duh figura se krece");
+                Thread.sleep(5000);
+                this.getD().removeDiamonds();
+            }catch (NullPointerException | InterruptedException ex) {
+                ex.printStackTrace();
             }
-        });
-    }*/
+        }
+    }
 }
