@@ -1,5 +1,7 @@
 package org.unibl.etf.game.cards;
 
+import org.unibl.etf.shape.DiamondShape;
+
 import java.io.File;
 import java.io.Serializable;
 
@@ -11,6 +13,7 @@ public abstract class Card implements Serializable {
     public Card ()
     {
         this.image=file.getAbsolutePath();
+
     }
 
     public String getSlika() {

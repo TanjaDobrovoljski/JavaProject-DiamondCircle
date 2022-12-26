@@ -29,7 +29,7 @@ import static sample.Game.playField;
 
 public class DiamondShape implements Serializable {
    private static JButton[][] buttons;
-    private static List<Tuple<Integer, Integer>> movementsOdd; //neparni
+    private static   List<Tuple<Integer, Integer>> movementsOdd; //neparni
     private static List<Tuple<Integer, Integer>> movementsEven; //parni
     private static int matrixSize;
     public static int random=0;
@@ -62,7 +62,6 @@ public class DiamondShape implements Serializable {
 
         if(random==0)
             random=(int)Math.floor(Math.random()*(max-min+1)+min);
-
         playField.setLayout(new GridLayout(random,random));
 
         buttons = new JButton[random][random];
@@ -92,15 +91,6 @@ public class DiamondShape implements Serializable {
         diamondSpiral();
 
     }
-
-    public List<Tuple<Integer, Integer>> getmovements()
-    {
-        if (matrixSize % 2 == 0)
-            return getMovementsEven();
-        else
-            return getMovementsOdd();
-    }
-
 
 
     public  List<Tuple<Integer, Integer>> getMovementsOdd() {
@@ -266,13 +256,18 @@ public class DiamondShape implements Serializable {
         this.movementSize = movementSize;
     }
 
-    public synchronized  void drawMatrix(Figure f,int x,int y) {
+    public   void drawMatrix(Figure f,int x,int y) {
         if ( f instanceof OrdinaryFigure)
             buttons[x][y].add(((OrdinaryFigure) f).getShape());
         else if ( f instanceof LevitatingFigure)
             buttons[x][y].add(((LevitatingFigure) f).getShape());
         else if ( f instanceof SuperFastFigure)
             buttons[x][y].add(((SuperFastFigure) f).getShape());
+        playField.revalidate();
+        playField.repaint();
+    }
+    public  void drawHoles(Hole h,int x,int y) {
+        buttons[x][y].add(new Hole());
         playField.revalidate();
         playField.repaint();
     }

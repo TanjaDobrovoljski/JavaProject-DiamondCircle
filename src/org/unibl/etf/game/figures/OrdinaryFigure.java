@@ -5,17 +5,23 @@ import org.unibl.etf.game.players.Player;
 import org.unibl.etf.shape.DiamondShape;
 import org.unibl.etf.tools.Tuple;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.TimerTask;
+import java.util.Timer;
 
 import static sample.Game.playField;
 import static sample.Game.playingDeck;
 
-public class OrdinaryFigure extends Figure{
+public class OrdinaryFigure extends Figure {
     private CircleShape shape;
-    private int indexForFutureMovements=0;
+    private int indexForFutureMovements=0,moves;
+    private Timer timer;
 
     public CircleShape getShape() {
         return shape;
@@ -30,56 +36,43 @@ public class OrdinaryFigure extends Figure{
         super(d,p);
         shape=new CircleShape();
         shape.setForeground(p.getColor());
+        timer=new Timer();
     }
-   // static int indexForFutureMovements=0; //problem za sve buduce ove objekte jer je staticki
+
     @Override
-    public  void run() { //pitanje? da li je potrebna sinhronizacija narednog bloka?
+    public  void makeMove() { //ova metoda moze u figuru,pa da se samo za svaki child overriduje koliko prelazi
 
-        while(this.isAlive())
-        {
-                try {
-                    this.setNumberOfMoves(playingDeck.drawCard());
-                    System.out.println(this.getNumberOfMoves() + " OVOLIKO SE puta pomjera");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                int moves = this.getNumberOfMoves();
+        moves = this.getNumberOfMoves();
+        if (moves!=0 && this.firstMove==true) {
+            moves++;
+            this.firstMove=false;
+        }
+                   for (ListIterator<Tuple<Integer, Integer>> it = this.getFutureMovements().listIterator(indexForFutureMovements); it.hasNext(); ) {
+                       Tuple<Integer, Integer> i = it.next();
+                       if (moves == 0) {
+                           // setTurn(false);
+                           break;
+                       }
+                       this.getD().drawMatrix(this, i.getItem1(), i.getItem2());
 
-            for (ListIterator<Tuple<Integer, Integer>> it = Figure.futureMovements.listIterator(indexForFutureMovements); it.hasNext(); ) {
-                Tuple<Integer, Integer> i = it.next();
-                this.getD().drawMatrix(this, i.getItem1(), i.getItem2());
-                if (moves == 0) {
+                       passedMovements.add(i);
+                       indexForFutureMovements++;
+                       if (passedMovements.size() == futureMovements.size()) {
+                           this.setAlive(false);
+                           break;
+                       }
 
-                    // podesiti da nije njegov red i notifyAll
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                }
-                try {
-                    System.out.println("kretanje " + this.getNumberOfMoves());
-                    this.getD().drawMatrix(this, i.getItem1(), i.getItem2());
-                    passedMovements.add(i);
-                    indexForFutureMovements++;
-                    System.out.println(passedMovements.size() + " " + futureMovements.size());
-                    if (passedMovements.size() == futureMovements.size()) {
-                        this.setAlive(false);
-                        break;
-                    }
-                    moves--;
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                       moves--;
+                             try {
+                                    Thread.sleep(1000);
+                                    } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                        }
 
-            }
-            if(!this.isAlive() )
-                break;
-            }
+
+                   }
+
+               }
 
     }
 
-
-}

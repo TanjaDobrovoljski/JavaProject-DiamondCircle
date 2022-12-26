@@ -1,6 +1,8 @@
 package org.unibl.etf.game.players;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -8,8 +10,6 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
-
-
 import org.unibl.etf.game.cards.Deck;
 import org.unibl.etf.game.figures.*;
 import org.unibl.etf.shape.Diamond;
@@ -19,19 +19,26 @@ import org.unibl.etf.tools.*;
 import static sample.Game.playField;
 import static sample.Game.playingDeck;
 
-public class Player extends Thread implements Serializable {
-    public static final Set<String> names=new HashSet<String>();
+public class Player implements Serializable {
+    public static final Set<String> names = new HashSet<String>();
     private String name;
     private static Integer idCounter = 1;
     private List<Figure> figures;
-    private int numOfFigures=0,uniqueID;
+    private int numOfFigures = 0, uniqueID, figureNumber = 0;
+    ;
     private Color color;
-    private boolean isPlayerInTheGame=true,turn=true;
-    private  DiamondShape d;
+    private boolean isPlayerInTheGame = true, turn = false;
+    private DiamondShape d;
 
+    public boolean isTurn() {
+        return turn;
+    }
 
+    public void setTurn(boolean turn) {
+        this.turn = turn;
+    }
 
-  /*  static
+/*  static
     {
         try {
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("IGRA_"+ LocalDate.now()+".txt"));
@@ -43,53 +50,49 @@ public class Player extends Thread implements Serializable {
         }
     }*/
 
-    public Player(String name, DiamondShape d) throws Exception
-    {
-        this.d=d;
+    public Player(String name, DiamondShape d) throws Exception {
+        this.d = d;
 
         if (!names.add(name))
             throw new UnavaliableNameException();
         this.name = name;
-        uniqueID=idCounter;
+        uniqueID = idCounter;
 
-        if(uniqueID==1)
-        { color=Color.RED;
+        if (uniqueID == 1) {
+            color = Color.RED;
             idCounter++;
-        }
-        else if(uniqueID==2) {
+        } else if (uniqueID == 2) {
             color = Color.GREEN;
             idCounter++;
-        }
-        else if(uniqueID==3) {
+        } else if (uniqueID == 3) {
             color = Color.BLUE;
             idCounter++;
-        }
-        else if(uniqueID==4) {
+        } else if (uniqueID == 4) {
             color = Color.YELLOW;
             idCounter = 1;
         }
 
-        figures=new ArrayList<>(4);
-        Random random=new Random();
+        figures = new ArrayList<>(4);
+        Random random = new Random();
 
         extracted(random);
+
 
         //dodaj figure i uvecaj im broj igracu
     }
 
     private void extracted(Random random) {
         int rand;
-        for(int i = 0; i<4; i++)
-        {
-            //rand = random.nextInt(4);
-            rand=1;
-            if(rand ==1)
-                figures.add(new OrdinaryFigure(d,this));
-            else if(rand ==2)
-                figures.add(new LevitatingFigure(d,this));
-            else if(rand ==3)
-                figures.add(new SuperFastFigure(d,this));
-            else if(rand==0)
+        for (int i = 0; i < 4; i++) {
+            rand = random.nextInt(4);
+            //rand = 1;
+            if (rand == 1)
+                figures.add(new OrdinaryFigure(d, this));
+            else if (rand == 2)
+                figures.add(new LevitatingFigure(d, this));
+            else if (rand == 3)
+                figures.add(new SuperFastFigure(d, this));
+            else if (rand == 0)
                 i--;
         }
     }
@@ -161,56 +164,43 @@ public class Player extends Thread implements Serializable {
 
     @Override
     public String toString() {
-        return "Igrac "+uniqueID+" - "+name;
+        return "Igrac " + uniqueID + " - " + name;
     }
 
-    static int figureNumber=0;
-    @Override
-    public void run()
-    {
-       /* if (!turn)
-            try {
-                wait();
-            } catch (Exception ex) {
-                System.out.println("Izuzetak!");
-            }
-    else{*/
-       // GhostFigure g=new GhostFigure(d,this);
-        //g.start();
+   /* class TimeListener implements ActionListener {
 
-        try {
-           /* for (Figure f:figures
-                 ) {
-                f.setAlive(true);
-                System.out.println("da li je red "+f.isTurn());
-                f.start();
-
-                */
-            Figure f=figures.get(figureNumber);
-
-            f.start();
-
-            while(f.isAlive())
-            { synchronized(f){
-
-                    { try{
-
-                        System.out.println("Waiting for "+f.getUniqueID()+" to complete...");
-                        System.out.println("da li je red "+f.isTurn());
-                        f.wait();
-
-                    }catch(InterruptedException e){
-                        e.printStackTrace();
-                    }}
-
-
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    playing();
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                } catch (InterruptedException interruptedException) {
+                    interruptedException.printStackTrace();
                 }
             }
-            figureNumber++;
-                System.out.println("u petlji figura");
-            } catch (Exception e) {
-            e.printStackTrace();
+
         }
-    }}
+        ActionListener listener=new TimeListener();
+        Timer timer=new Timer(1000,listener);
+        */
 
 
+    public void playing() throws IOException, InterruptedException {
+
+
+            if (figureNumber < 4 && figures.get(figureNumber).isFIgureAlive()) {
+                figures.get(figureNumber).setNumberOfMoves(playingDeck.drawCard());
+                if (figures.get(figureNumber) instanceof OrdinaryFigure)
+                    ((OrdinaryFigure) figures.get(figureNumber)).makeMove();
+                else if (figures.get(figureNumber) instanceof LevitatingFigure)
+                    ((LevitatingFigure) figures.get(figureNumber)).makeMove();
+                if (figures.get(figureNumber) instanceof SuperFastFigure)
+                    ((SuperFastFigure) figures.get(figureNumber)).makeMove();
+                if (!figures.get(figureNumber).isFIgureAlive())
+                    figureNumber++;
+            } else
+                this.setPlayerInTheGame(false);
+
+    }
+}

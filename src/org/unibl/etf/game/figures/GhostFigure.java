@@ -11,6 +11,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.Serializable;
 import java.net.URL;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -19,19 +20,27 @@ import java.util.*;
 
 import static sample.Game.playField;
 
-public class GhostFigure extends Figure{
+public class GhostFigure extends Thread implements Serializable {
     private int matrixDimension,rand;
     private Set<Diamond> list=new HashSet<Diamond>();
+    private DiamondShape d;
 
-
-    public GhostFigure(DiamondShape d, Player p)
+    public GhostFigure(DiamondShape d)
     {
-        super(d,p);
+        this.d=d;
         this.matrixDimension=DiamondShape.random;
     }
 
     public Set<Diamond> getList() {
         return list;
+    }
+
+    public DiamondShape getD() {
+        return d;
+    }
+
+    public void setD(DiamondShape d) {
+        this.d = d;
     }
 
     public void setList(Set<Diamond> list) {
@@ -47,11 +56,10 @@ public class GhostFigure extends Figure{
             if(rand >= 2 && rand<= matrixDimension) break;
         }
         int tmpRand=rand;
-        List<Tuple<Integer, Integer>> temp=this.getD().getmovements();
+        List<Tuple<Integer, Integer>> temp=getD().movements();
         while(tmpRand>0)
         {
             Tuple<Integer,Integer> element = temp.get(new Random().nextInt(temp.size()));
-
             try {
                 list.add(new Diamond(element.getItem1(), element.getItem2()));
                 tmpRand--;
@@ -69,7 +77,6 @@ public class GhostFigure extends Figure{
         {
             try {
                 playGhost();
-                System.out.println("duh figura se krece");
                 Thread.sleep(5000);
                 this.getD().removeDiamonds();
             }catch (NullPointerException | InterruptedException ex) {

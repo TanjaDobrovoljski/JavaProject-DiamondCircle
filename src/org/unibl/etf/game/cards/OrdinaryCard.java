@@ -1,5 +1,7 @@
 package org.unibl.etf.game.cards;
 
+import org.unibl.etf.shape.DiamondShape;
+
 public class OrdinaryCard extends Card{
     private int numOfFields;
 

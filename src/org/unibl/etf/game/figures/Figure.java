@@ -13,19 +13,17 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Timer;
 
-import static sample.Game.playField;
-
-public class Figure extends Thread  implements Serializable {
+public abstract class Figure implements Serializable {
     private static Integer idCounter = 1;
     private int uniqueID;
-    protected boolean alive,turn=false;
-    protected static List<Tuple<Integer, Integer>> futureMovements;
+    protected boolean alive,turn=false,firstMove;
+    protected  List<Tuple<Integer, Integer>> futureMovements;
     protected  List<Tuple<Integer, Integer>> passedMovements;
     protected  int numberOfMoves=1;
     protected int numOfDiamonds;
     protected Player player;
+
 
     public boolean isTurn() {
         return turn;
@@ -52,7 +50,6 @@ public class Figure extends Thread  implements Serializable {
     public void setUniqueID(Integer uniqueID) {
         this.uniqueID = uniqueID;
     }
-
 
 
     public void setAlive(boolean alive) {
@@ -99,9 +96,6 @@ public class Figure extends Thread  implements Serializable {
         this.figureName = figureName;
     }
 
-
-
-
     public boolean isFIgureAlive() {
         return alive;
     }
@@ -114,30 +108,21 @@ public class Figure extends Thread  implements Serializable {
         uniqueID=idCounter++;
         figureName="Figura "+idCounter;
         this.numOfDiamonds=0;
-        this.alive=false;
+        this.alive=true;
         this.player=p;
         this.d=d;
-        futureMovements=d.getmovements();
+        this.firstMove=true;
+        futureMovements=d.movements();
         passedMovements=new ArrayList<>();
 
     }
 
-    @Override
-    public  void  run()
-    {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-    }
-
-    public static List<Tuple<Integer, Integer>> getFutureMovements() {
+    public  List<Tuple<Integer, Integer>> getFutureMovements() {
         return futureMovements;
     }
 
-    public static void setFutureMovements(List<Tuple<Integer, Integer>> futureMovements) {
-        Figure.futureMovements = futureMovements;
+    public  void setFutureMovements(List<Tuple<Integer, Integer>> futureMovements) {
+        this.futureMovements = futureMovements;
     }
 
     public  List<Tuple<Integer, Integer>> getPassedMovements() {
@@ -148,13 +133,6 @@ public class Figure extends Thread  implements Serializable {
         this.passedMovements = passedMovements;
     }
 
-    public int getNumOfDiamons() {
-        return numOfDiamonds;
-    }
-
-    public void setNumOfDiamons(int numOdDiamons) {
-        this.numOfDiamonds = numOdDiamons;
-    }
 
     @Override
     public boolean equals(Object obj) {
@@ -169,4 +147,6 @@ public class Figure extends Thread  implements Serializable {
     public String toString() {
         return "Figura "+uniqueID;
     }
+
+    public abstract void makeMove();
 }
