@@ -14,23 +14,23 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public abstract class Figure implements Serializable {
+public abstract class Figure  implements Serializable {
     private static Integer idCounter = 1;
     private int uniqueID;
-    protected boolean alive,turn=false,firstMove;
+    protected boolean alive,finished=false,firstMove;
     protected  List<Tuple<Integer, Integer>> futureMovements;
     protected  List<Tuple<Integer, Integer>> passedMovements;
     protected  int numberOfMoves=1;
-    protected int numOfDiamonds;
+    protected int numOfDiamonds=0;
     protected Player player;
 
 
-    public boolean isTurn() {
-        return turn;
+    public boolean isFinished() {
+        return finished;
     }
 
-    public void setTurn(boolean turn) {
-        this.turn = turn;
+    public void setFinished(boolean turn) {
+        this.finished = turn;
     }
 
     private DiamondShape d;
@@ -148,5 +148,5 @@ public abstract class Figure implements Serializable {
         return "Figura "+uniqueID;
     }
 
-    public abstract void makeMove();
+    public abstract void makeMove() throws InterruptedException;
 }

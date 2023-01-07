@@ -6,16 +6,12 @@ import java.awt.event.ActionListener;
 import java.awt.geom.Ellipse2D;
 import java.io.Serializable;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.unibl.etf.game.figures.Figure;
-import org.unibl.etf.game.figures.LevitatingFigure;
-import org.unibl.etf.game.figures.OrdinaryFigure;
-import org.unibl.etf.game.figures.SuperFastFigure;
+import org.unibl.etf.game.cards.SpecialCard;
+import org.unibl.etf.game.figures.*;
 import org.unibl.etf.tools.*;
 
 import javax.swing.*;
@@ -28,6 +24,7 @@ import static sample.Game.playField;
 
 
 public class DiamondShape implements Serializable {
+
    private static JButton[][] buttons;
     private static   List<Tuple<Integer, Integer>> movementsOdd; //neparni
     private static List<Tuple<Integer, Integer>> movementsEven; //parni
@@ -78,6 +75,7 @@ public class DiamondShape implements Serializable {
                 buttons[x][y] = new JButton();
                 buttons[x][y].setText(tf.getText());
                 buttons[x][y].setEnabled(false);
+               // buttons[x][y].setActionCommand("empty");
                 buttons[x][y].setPreferredSize(new Dimension(100,100));
                 playField.add(buttons[x][y]);
                 k++;
@@ -257,20 +255,36 @@ public class DiamondShape implements Serializable {
     }
 
     public   void drawMatrix(Figure f,int x,int y) {
-        if ( f instanceof OrdinaryFigure)
+        if ( f instanceof OrdinaryFigure) {
             buttons[x][y].add(((OrdinaryFigure) f).getShape());
+            if (checkField(x,y)) {
+                ((OrdinaryFigure) f).increaseMove();
+                removeDiamond(x,y);
+
+
+            }
+        }
         else if ( f instanceof LevitatingFigure)
-            buttons[x][y].add(((LevitatingFigure) f).getShape());
+        { buttons[x][y].add(((LevitatingFigure) f).getShape());
+            if (checkField(x,y)) {
+                ((LevitatingFigure) f).increaseMove();
+                removeDiamond(x,y);
+
+            }
+        }
         else if ( f instanceof SuperFastFigure)
-            buttons[x][y].add(((SuperFastFigure) f).getShape());
+        { buttons[x][y].add(((SuperFastFigure) f).getShape());
+            if (checkField(x,y)) {
+                ((SuperFastFigure) f).increaseMove();
+                removeDiamond(x,y);
+
+            }
+        }
+
         playField.revalidate();
         playField.repaint();
     }
-    public  void drawHoles(Hole h,int x,int y) {
-        buttons[x][y].add(new Hole());
-        playField.revalidate();
-        playField.repaint();
-    }
+
 
     public void removeDiamonds() //refresh za duh figuru (uklanjanje dijamanata)
     {
@@ -280,7 +294,6 @@ public class DiamondShape implements Serializable {
                var list2= k.getComponents();
                for (var m:list2)
                {
-
                    if (m instanceof Diamond)
                    { playField.remove(m);
                        k.remove(m);
@@ -291,8 +304,47 @@ public class DiamondShape implements Serializable {
         }
     }
 
-    public Component checkField(int x,int y)
+    public void removeDiamond(int x,int y) //refresh za duh figuru (uklanjanje dijamanata)
     {
-        return buttons[x][y].getComponent(0);
+        var list2= buttons[x][y].getComponents();
+                for (var m:list2)
+                {
+                    if(buttons[x][y].getComponents().length>1)
+                    {
+                        if ((m.equals(buttons[x][y].getComponent(0)) || m.equals(buttons[x][y].getComponent(1))) && m instanceof Diamond)
+                        { playField.remove(m);
+
+                            buttons[x][y].remove(m);
+                            playField.revalidate();
+                            playField.repaint();
+                            break;
+                        }
+                    }
+                    else if (m.equals(buttons[x][y].getComponent(0)) && m instanceof Diamond)
+                    { playField.remove(m);
+
+                        buttons[x][y].remove(m);
+                        playField.revalidate();
+                        playField.repaint();
+                        break;
+                    }
+                }
+    }
+
+    public boolean checkField(int x,int y)
+    {
+        if(buttons[x][y].getComponent(0) instanceof Diamond)
+            return true;
+        else if(buttons[x][y].getComponents().length>1)
+        {
+            if(buttons[x][y].getComponent(1) instanceof Diamond)
+                return true;
+        }
+        else if(buttons[x][y].getComponents().length>2)
+        {
+            if(buttons[x][y].getComponent(2) instanceof Diamond)
+                return true;
+        }
+        return false;
     }
 }

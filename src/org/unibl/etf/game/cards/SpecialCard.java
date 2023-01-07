@@ -1,5 +1,9 @@
 package org.unibl.etf.game.cards;
 import static sample.Game.playField;
+
+import org.unibl.etf.game.figures.OrdinaryFigure;
+import org.unibl.etf.game.figures.StarShape;
+import org.unibl.etf.game.players.Player;
 import org.unibl.etf.shape.*;
 import org.unibl.etf.tools.Tuple;
 
@@ -10,7 +14,7 @@ public class SpecialCard extends Card{
 
 
     private int rand;
-    private Set<Hole> list= new HashSet<>();
+    private static Set<Hole> list= new HashSet<>();
 
     public SpecialCard() {
         super();
@@ -18,8 +22,18 @@ public class SpecialCard extends Card{
 
     }
 
+    public static Set<Hole> getList() {
+        return list;
+    }
+
+    public static void setList(Set<Hole> list) {
+        SpecialCard.list = list;
+    }
+
     public void setHoles() throws InterruptedException {
 
+        if(!list.isEmpty())
+            list.clear();
         Random random = new Random();
         rand = 0;
         while (true){
@@ -39,8 +53,10 @@ public class SpecialCard extends Card{
             }
         }
 
-        list.stream().forEach(hole -> DiamondShape.getButtons()[hole.getPositionX()][hole.getPositionY()].add(hole));
-        list.clear();
+
+       list.stream().forEach(hole -> DiamondShape.getButtons()[hole.getPositionX()][hole.getPositionY()].add(hole));
+        playField.revalidate();
+        playField.repaint();
 
     }
 
@@ -54,8 +70,10 @@ public class SpecialCard extends Card{
                 {
 
                     if (m instanceof Hole)
-                    { playField.remove(m);
+                    {
+                        playField.remove(m);
                         k.remove(m);
+
 
                     }
                 }

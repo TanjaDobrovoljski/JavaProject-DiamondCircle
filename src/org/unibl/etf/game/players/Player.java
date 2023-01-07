@@ -11,24 +11,30 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
 import org.unibl.etf.game.cards.Deck;
+import org.unibl.etf.game.cards.SpecialCard;
 import org.unibl.etf.game.figures.*;
 import org.unibl.etf.shape.Diamond;
 import org.unibl.etf.shape.DiamondShape;
 import org.unibl.etf.shape.Hole;
 import org.unibl.etf.tools.*;
-import static sample.Game.playField;
+import sample.Game;
+
+
+import static sample.Game.figureCoordinates;
 import static sample.Game.playingDeck;
 
 public class Player implements Serializable {
     public static final Set<String> names = new HashSet<String>();
+
     private String name;
     private static Integer idCounter = 1;
     private List<Figure> figures;
-    private int numOfFigures = 0, uniqueID, figureNumber = 0;
-    ;
+    private int numOfFigures = 0, uniqueID, figureNumber = 0,figuresFinishedGame=0;
+
     private Color color;
     private boolean isPlayerInTheGame = true, turn = false;
     private DiamondShape d;
+    private String textPlayer;
 
     public boolean isTurn() {
         return turn;
@@ -78,14 +84,15 @@ public class Player implements Serializable {
         extracted(random);
 
 
+
         //dodaj figure i uvecaj im broj igracu
     }
 
     private void extracted(Random random) {
         int rand;
         for (int i = 0; i < 4; i++) {
-            rand = random.nextInt(4);
-            //rand = 1;
+          // rand = random.nextInt(4);
+            rand = 1;
             if (rand == 1)
                 figures.add(new OrdinaryFigure(d, this));
             else if (rand == 2)
@@ -167,40 +174,64 @@ public class Player implements Serializable {
         return "Igrac " + uniqueID + " - " + name;
     }
 
-   /* class TimeListener implements ActionListener {
+    public int getFiguresFinishedGame() {
+        return figuresFinishedGame;
+    }
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    playing();
-                } catch (IOException ioException) {
-                    ioException.printStackTrace();
-                } catch (InterruptedException interruptedException) {
-                    interruptedException.printStackTrace();
-                }
-            }
-
-        }
-        ActionListener listener=new TimeListener();
-        Timer timer=new Timer(1000,listener);
-        */
-
+    public void setFiguresFinishedGame(int figuresFinishedGame) {
+        this.figuresFinishedGame = figuresFinishedGame;
+    }
 
     public void playing() throws IOException, InterruptedException {
 
-
-            if (figureNumber < 4 && figures.get(figureNumber).isFIgureAlive()) {
+            if (figureNumber < 4 && figures.get(figureNumber).isFIgureAlive())
+            {
+                textPlayer=Game.text.getText();
                 figures.get(figureNumber).setNumberOfMoves(playingDeck.drawCard());
-                if (figures.get(figureNumber) instanceof OrdinaryFigure)
+                textPlayer=figures.get(figureNumber).toString()+", prelazi ";
+                Game.text.append(textPlayer);
+            if (figures.get(figureNumber) instanceof OrdinaryFigure)
                     ((OrdinaryFigure) figures.get(figureNumber)).makeMove();
                 else if (figures.get(figureNumber) instanceof LevitatingFigure)
                     ((LevitatingFigure) figures.get(figureNumber)).makeMove();
-                if (figures.get(figureNumber) instanceof SuperFastFigure)
+                else if (figures.get(figureNumber) instanceof SuperFastFigure)
                     ((SuperFastFigure) figures.get(figureNumber)).makeMove();
                 if (!figures.get(figureNumber).isFIgureAlive())
+                {
+                    if(figures.get(figureNumber).isFinished())
+                        figuresFinishedGame++;
+                    Tuple<Integer,Integer> last_move= figures.get(figureNumber).getPassedMovements().get(figures.get(figureNumber).getPassedMovements().size()-1);
+                    figureCoordinates.remove(figures.get(figureNumber));
                     figureNumber++;
+                }
             } else
                 this.setPlayerInTheGame(false);
+            textPlayer="";
+
+    }
+
+
+
+    public void figureOnHole() throws InterruptedException {
+        if (figureNumber==4)
+            figureNumber=3;
+        if(figures.get(figureNumber).getPassedMovements().size()!=0 && !((figures.get(figureNumber)) instanceof levitationInterface))
+        {
+        Set<Hole> list=SpecialCard.getList();
+          Tuple<Integer,Integer> last_move= figures.get(figureNumber).getPassedMovements().get(figures.get(figureNumber).getPassedMovements().size()-1);
+        for (Hole h:list)
+        {
+            if (h.getPositionX().equals(last_move.getItem1()) && h.getPositionY().equals(last_move.getItem2()))
+            {
+                figures.get(figureNumber).setAlive(false);
+               DiamondShape.getButtons()[last_move.getItem1()][last_move.getItem2()].removeAll();
+               figureCoordinates.remove(figures.get(figureNumber));
+                figureNumber++;
+                DiamondShape.getButtons()[last_move.getItem1()][last_move.getItem2()].add(h);
+                break;
+            }
+        }
+    }
 
     }
 }

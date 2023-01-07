@@ -28,6 +28,7 @@ public final class Diamond extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g); // paint the background image and scale it to fill the entire space
         g.drawImage(im,0,0,null);
+
     }
     public Integer getPositionX() {
         return positionX;

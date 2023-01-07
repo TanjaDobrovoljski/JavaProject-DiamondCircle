@@ -3,13 +3,6 @@ package org.unibl.etf.game.cards;
 import org.unibl.etf.shape.DiamondShape;
 import org.unibl.etf.tools.CircularArrayList;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.nio.Buffer;
 import java.util.*;
 
@@ -20,7 +13,7 @@ public class Deck{
 
     public Deck() {
 
-        deck = new CircularArrayList<Card>(52);
+        deck = new CircularArrayList<>(52);
         for (int i = 0; i < 10; i++) {
             deck.add(new OrdinaryCard(1));
             deck.add(new OrdinaryCard(2));
@@ -43,14 +36,23 @@ public class Deck{
         this.deck = deck;
     }
 
+    public int getHoleFlag() {
+        return holeFlag;
+    }
+
+    public void setHoleFlag(int holeFlag) {
+        this.holeFlag = holeFlag;
+    }
+
     public  int drawCard() throws InterruptedException {
 
         if (numofDraw == deck.capacity()-1)
         { numofDraw = 0;
             deck=tmp;}
-        System.out.println(numofDraw +" "+deck.capacity());
+
         Card tmp = deck.get(numofDraw);
         numofDraw++;
+
 
         if (tmp instanceof  OrdinaryCard)
         {
@@ -58,17 +60,30 @@ public class Deck{
 
             {
                 Thread.sleep(1000);
+                SpecialCard.getList().clear();
                 SpecialCard.removeHoles();
+
+
                 holeFlag=0;
 
             }
-
             return ((OrdinaryCard) tmp).getNumOfFields();
     }
         else
         {
+            if(!SpecialCard.getList().isEmpty())
+
+            {
+                Thread.sleep(1000);
+                SpecialCard.getList().clear();
+                SpecialCard.removeHoles();
+
+                }
             holeFlag=1;
+
             ((SpecialCard) tmp).setHoles();
+
+
             return 0;
         }
     }
