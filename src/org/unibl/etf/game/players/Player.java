@@ -56,11 +56,12 @@ public class Player implements Serializable {
         }
     }*/
 
-    public Player(String name, DiamondShape d) throws Exception {
+    public Player(String name, DiamondShape d) throws UnavaliableNameException {
         this.d = d;
 
-        if (!names.add(name))
-            throw new UnavaliableNameException();
+       if ( !"".equals(name) && !" ".equals(name) )
+           if(!names.add(name))
+          throw new UnavaliableNameException();
         this.name = name;
         uniqueID = idCounter;
 
@@ -91,8 +92,8 @@ public class Player implements Serializable {
     private void extracted(Random random) {
         int rand;
         for (int i = 0; i < 4; i++) {
-          // rand = random.nextInt(4);
-            rand = 1;
+           rand = random.nextInt(4);
+           //rand = 3;
             if (rand == 1)
                 figures.add(new OrdinaryFigure(d, this));
             else if (rand == 2)
@@ -186,9 +187,11 @@ public class Player implements Serializable {
 
             if (figureNumber < 4 && figures.get(figureNumber).isFIgureAlive())
             {
+                if(!Game.model.contains(figures.get(figureNumber)))
+                    Game.model.addElement(figures.get(figureNumber));
                 textPlayer=Game.text.getText();
                 figures.get(figureNumber).setNumberOfMoves(playingDeck.drawCard());
-                textPlayer=figures.get(figureNumber).toString()+", prelazi ";
+                textPlayer=figures.get(figureNumber).toString()+"\n prelazi ";
                 Game.text.append(textPlayer);
             if (figures.get(figureNumber) instanceof OrdinaryFigure)
                     ((OrdinaryFigure) figures.get(figureNumber)).makeMove();

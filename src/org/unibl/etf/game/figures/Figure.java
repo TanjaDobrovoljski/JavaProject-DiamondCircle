@@ -103,6 +103,10 @@ public abstract class Figure  implements Serializable {
 
     protected String figureName;
 
+    public Figure getFigure(String name){
+        return this;
+    }
+
     public Figure(DiamondShape d,Player p)
     {
         uniqueID=idCounter++;

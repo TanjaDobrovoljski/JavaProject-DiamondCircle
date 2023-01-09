@@ -67,7 +67,6 @@ public class OrdinaryFigure extends Figure {
         mov=moves;
         if (moves != 0 && this.firstMove == true) {
             moves++;
-
             this.firstMove = false;
         }
 
@@ -82,8 +81,9 @@ public class OrdinaryFigure extends Figure {
                 {
                     Game.text.removeAll();
                     Game.text.setText(tmpText);
-                    Game.text.append(0+" pozicija");
-                    break;}
+                    Game.text.append(" 0 pozicija");
+                    break;
+                }
                 if (!figureCoordinates.containsValue(i)) {
                     figureCoordinates.put(this, i);
                     break;
@@ -130,7 +130,7 @@ public class OrdinaryFigure extends Figure {
                 Game.text.removeAll();
                 Game.text.setText(tmpText);
 
-                Game.text.append(mov+",\npomjera se sa pozicije " + DiamondShape.getButtons()[last_move.getItem1()][last_move.getItem2()].getText());
+                Game.text.append(mov+" polja, pomjera se sa\npozicije " + DiamondShape.getButtons()[last_move.getItem1()][last_move.getItem2()].getText());
                 tmpTextEnd=Game.text.getText();
                 flagBeg = 1;
             }
@@ -159,11 +159,6 @@ public class OrdinaryFigure extends Figure {
 
 
         }
-
-                   /*if(this.getPassedMovements().size()!=0) {
-                       Tuple<Integer, Integer> last_move = this.getPassedMovements().get(this.getPassedMovements().size() - 1);
-                       Game.text.append(" na " + DiamondShape.getButtons()[last_move.getItem1()][last_move.getItem2()].getText());
-                   }*/
 
 
     }}

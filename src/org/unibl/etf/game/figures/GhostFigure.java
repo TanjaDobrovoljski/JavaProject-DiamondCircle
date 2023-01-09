@@ -77,6 +77,7 @@ public class GhostFigure extends Thread implements Serializable {
         {
             try {
                 playGhost();
+
                 Thread.sleep(5000);
                 this.getD().removeDiamonds();
             }catch (NullPointerException | InterruptedException ex) {

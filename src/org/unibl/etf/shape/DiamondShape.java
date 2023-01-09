@@ -276,6 +276,7 @@ public class DiamondShape implements Serializable {
         { buttons[x][y].add(((SuperFastFigure) f).getShape());
             if (checkField(x,y)) {
                 ((SuperFastFigure) f).increaseMove();
+
                 removeDiamond(x,y);
 
             }
