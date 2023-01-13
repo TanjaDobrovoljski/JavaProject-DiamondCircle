@@ -28,6 +28,13 @@ public abstract class Figure  implements Serializable {
     public boolean isFinished() {
         return finished;
     }
+    public String getFinished()
+    {
+        if (finished==false)
+            return "NE";
+        else
+            return "DA";
+    }
 
     public void setFinished(boolean turn) {
         this.finished = turn;

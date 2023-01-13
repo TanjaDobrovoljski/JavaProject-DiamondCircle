@@ -7,14 +7,19 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 import java.util.Timer;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 import org.unibl.etf.game.cards.Card;
@@ -24,6 +29,7 @@ import org.unibl.etf.game.players.Player;
 import org.unibl.etf.shape.*;
 import org.unibl.etf.game.figures.*;
 import org.unibl.etf.tools.GameDurationTimer;
+import org.unibl.etf.tools.GenLogger;
 import org.unibl.etf.tools.Tuple;
 import org.unibl.etf.tools.UnavaliableNameException;
 
@@ -32,12 +38,12 @@ public class Game extends JFrame implements Serializable {
     public static Hashtable<Figure, Tuple<Integer, Integer>> figureCoordinates = new Hashtable<>();
     private JPanel mainPanel;
     private java.util.Timer timer;
-    private JButton startFromBeginningButton;
+    public boolean pause=false;
     private JTextArea moveDescription;
     private JEditorPane editorPane1;
     private JPanel titleLabel;
     private JLabel title;
-    private JButton button1;
+    private JButton showFilesButton;
     private JScrollPane figuresList;
     private JPanel imagePanel;
     // private JTable matrix;
@@ -77,10 +83,21 @@ public class Game extends JFrame implements Serializable {
     private int currentPlayer, numOfPlayers = 0;
     private List<Player> startingNiz, finishingNiz = new ArrayList<>(), lostNiz = new ArrayList<>();
     public static DefaultListModel model = new DefaultListModel();
+    private AtomicBoolean isPaused;
+    private boolean finished=false;
+    private static String finishedTime="";
 
 
+    public void pause() {
+        isPaused.set(true);
+    }
 
-    public Game( List<String> niz) throws UnavaliableNameException {
+    public void resume() {
+        isPaused.set(false);
+    }
+
+
+    public Game( List<String> niz) throws UnavaliableNameException, IOException {
         super();
         setContentPane(mainPanel);
         setVisible(true);
@@ -88,14 +105,21 @@ public class Game extends JFrame implements Serializable {
         setSize(1200, 800);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        showFilesButton.setText("Prikaz liste\nfajlova sa\nrezultatima");
+        showFilesButton.setEnabled(false);
 
         if(niz.size()>=2){
+            editorPane1.setText("Trenutni broj\nodigranih igara je: "+String.valueOf(Files.walk(Paths.get("."+ File.separator+"REZULTATI"))
+                    .filter(p -> p.toString().endsWith(".txt"))
+                    .count()));
+            isPaused=new AtomicBoolean(false);
             playField = middle;
             DiamondShape d = new DiamondShape();
-
             startingNiz=new ArrayList<>();
             numOfPlayers = niz.size();
-            Collections.shuffle(niz);
+            GhostFigure g = new GhostFigure(d);
+            g.start();
+
             for (int i=0;i<niz.size();i++)
             {
                 Player p = new Player(niz.get(i), d);
@@ -123,18 +147,13 @@ public class Game extends JFrame implements Serializable {
         // Arrays.stream(DiamondShape.getButtons()).flatMap(Arrays::stream).forEach(x -> x.removeAll());  brise sve
 
         currentPlayer = 0;
-        GhostFigure g = new GhostFigure(d);
-        g.start();
-
-
-
-
 
         timer = new java.util.Timer();
 
 
 
         list1.setModel(model);
+
 
         list1.addListSelectionListener(new ListSelectionListener() {
             @Override
@@ -149,44 +168,95 @@ public class Game extends JFrame implements Serializable {
                }
             }
         });
+            GameDurationTimer gameTimer = new GameDurationTimer(this);
+            gameTimer.start();
 
 
-        startFromBeginningButton.addActionListener(listener -> {
 
-
-        });
-
-        GameDurationTimer gameTimer = new GameDurationTimer(this);
-        gameTimer.start();
 
 
        // DiamondShape.getButtons()[DiamondShape.movements().get(0).getItem1()][DiamondShape.movements().get(0).getItem2()].add(new Diamond());
 
-        simulation();
+
+            timer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                        simulation();
+                        if(finished==true)
+                        {
+                            d.removeDiamonds();
+                            SpecialCard.removeHoles();
+                            g.stop();
+                            gameTimer.stop();
+                            moveDescription.setText("IGRA JE ZAVRŠENA!");
+                            finishedTime=gameTimer.getDdMinutes()+":"+gameTimer.getDdSeconds();
+                            try {
+                                writeInFIle();
+                                editorPane1.setText("");
+                                editorPane1.setText("Trenutni broj\nodigranih igara je: "+String.valueOf(Files.walk(Paths.get("."+ File.separator+"REZULTATI"))
+                                        .filter(p -> p.toString().endsWith(".txt"))
+                                        .count()));
+                                showFilesButton.setEnabled(true);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                }},0,1000);
+
+
+
         // gameTimer.stop();
-        d.removeDiamonds();
-        SpecialCard.removeHoles();
-        if (finishingNiz.size() != 0) {
+
+
+       /* if (finishingNiz.size() != 0) {
             int i = 1;
             for (Player p : finishingNiz) {
                 System.out.println(i + " mjesto: " + p.toString());
             }
-        }
-
+        }*/
 
         pauseButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-            }
-        });
+                pause();
+                GhostFigure.pause=true;
+                GameDurationTimer.paused=true;
+                pauseButton.setEnabled(false);
+                continueButton.setEnabled(true);
+
+
+
+            }});
+
         continueButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
+                resume();
+                GhostFigure.pause=false;
+                GameDurationTimer.paused=false;
+                pauseButton.setEnabled(true);
+                continueButton.setEnabled(false);
+            }
+
+        });
+    }
+        showFilesButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    if(Files.walk(Paths.get("."+ File.separator+"REZULTATI"))
+                            .filter(p -> p.toString().endsWith(".txt"))
+                            .count()!=0)
+                    new FileListForm(Paths.get("."+ File.separator+"REZULTATI"));
+
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
             }
         });
-    }}
+    }
 
 
     public void slika(Card s) throws IOException, InterruptedException {
@@ -199,74 +269,120 @@ public class Game extends JFrame implements Serializable {
     }
 
 
+
     public void simulation() //modifikovati za 4 igraca i paziti ko je zavrsio
     {
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                while (numOfPlayers > 0) {
-                    currentPlayer = 0;
-                    for (; currentPlayer < startingNiz.size(); ) {
-                        if (!(lostNiz.contains(startingNiz.get(currentPlayer))) && startingNiz.get(currentPlayer).isPlayerInTheGame()) {
-                            try {
-                                slika(playingDeck.image());
-                                text.setText("Na potezu je " + startingNiz.get(currentPlayer).toString() + ", ");
-                                startingNiz.get(currentPlayer).playing();
 
-                                if (!SpecialCard.getList().isEmpty()) {
-
-                                    for (Player p : startingNiz) {
-                                        p.figureOnHole();
-                                    }
+        while (numOfPlayers > 0) {
 
 
-                                }
-                                currentPlayer++;
-                            } catch (IOException ioException) {
-                                ioException.printStackTrace();
-                            } catch (InterruptedException interruptedException) {
-                                interruptedException.printStackTrace();
+            currentPlayer = 0;
+
+                while(currentPlayer < startingNiz.size() && !isPaused.get()){
+                if (!(lostNiz.contains(startingNiz.get(currentPlayer))) && startingNiz.get(currentPlayer).isPlayerInTheGame()) {
+                    try {
+                        slika(playingDeck.image());
+                        text.setText("Na potezu je " + startingNiz.get(currentPlayer).toString() + ", ");
+                        startingNiz.get(currentPlayer).playing();
+
+                        if (!SpecialCard.getList().isEmpty()) {
+
+                            for (Player p : startingNiz) {
+                                p.figureOnHole();
                             }
-                        } else {
-                            if (startingNiz.get(currentPlayer).getFiguresFinishedGame() == 4)
-                                if (!finishingNiz.contains(startingNiz.get(currentPlayer)))
-                                    finishingNiz.add(startingNiz.get(currentPlayer));
 
-                            if (!lostNiz.contains(startingNiz.get(currentPlayer))) {
-                                System.out.println("igrac " + startingNiz.get(currentPlayer).getUniqueID() + " nije vise u igri");
-                                lostNiz.add(startingNiz.get(currentPlayer));
-                                numOfPlayers--;
-                            }
-                            currentPlayer++;
+
                         }
-                    }
 
+                        currentPlayer++;
+                    } catch (IOException ioException) {
+                        ioException.printStackTrace();
+                    } catch (InterruptedException interruptedException) {
+                        interruptedException.printStackTrace();
+                    }
+                } else {
+                    if (startingNiz.get(currentPlayer).getFiguresFinishedGame() == 4)
+                        if (!finishingNiz.contains(startingNiz.get(currentPlayer)))
+                            finishingNiz.add(startingNiz.get(currentPlayer));
+
+                    if (!lostNiz.contains(startingNiz.get(currentPlayer))) {
+                        lostNiz.add(startingNiz.get(currentPlayer));
+                        numOfPlayers--;
+                    }
+                    currentPlayer++;
                 }
             }
-        }, 0, 1000);
-    }
 
-
+        }
+       finished=true;
 
 }
- /* public  void gameDurationTimer()
-  {
-      gameTimer=new Timer(1000, new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-              second++;
-              ddSeconds=dFormat.format(second);
-              ddMinutes=dFormat.format(minute);
-              gameTime.setText(ddMinutes+" : "+ddSeconds);
-              if(second==60)
-              {
-                  second=0;
-                  minute++;
-                  gameTime.setText(ddMinutes+" : "+ddSeconds);
-              }
-          }
-      });
-  }*/
+
+public void writeInFIle() throws IOException {
+    timer.cancel();
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("-HH_mm_ss_dd.MM.yyyy");
+
+                String info = "", igrac = "", figura = "", kretanje = "",tmp="";
+                for (Player p : startingNiz) {
+
+                    igrac += p.toString() + "\n";
+                    for (Figure f : p.getFigures()) {
+                        if (f instanceof OrdinaryFigure) {
+                            figura += "\t"+f.toString() + " " + p.getColorName() + ") - pređeni put ( ";
+                            for (Tuple<Integer, Integer> it : f.getPassedMovements()) {
+                                kretanje += DiamondShape.getButtons()[it.getItem1()][it.getItem2()].getText() + "-";
+
+                            }
+                            kretanje = kretanje.substring(0, kretanje.length() - 1);
+                            figura += kretanje;
+                            kretanje = "";
+                            figura += ") - stigla da cilja? " + f.getFinished() + "\n";
+                        }
+                        else if (f instanceof LevitatingFigure) {
+                            figura += "\t"+f.toString() + " " + p.getColorName() + ") - pređeni put ( ";
+                            for (Tuple<Integer, Integer> it : f.getPassedMovements()) {
+                                kretanje += DiamondShape.getButtons()[it.getItem1()][it.getItem2()].getText() + "-";
+
+                            }
+                            kretanje = kretanje.substring(0, kretanje.length() - 1);
+                            figura += kretanje;
+                            kretanje = "";
+                            figura += ") - stigla da cilja? " + f.getFinished() + "\n";
+                        }
+                       else  if (f instanceof SuperFastFigure) {
+                            figura += "\t"+f.toString() + " " + p.getColorName() + ") - pređeni put ( ";
+                            for (Tuple<Integer, Integer> it : f.getPassedMovements()) {
+                                kretanje += DiamondShape.getButtons()[it.getItem1()][it.getItem2()].getText() + "-";
+
+                            }
+                            kretanje = kretanje.substring(0, kretanje.length() - 1);
+                            figura += kretanje;
+                            kretanje = "";
+                            figura += ") - stigla da cilja? " + f.getFinished() + "\n";
+                        }
+
+                       tmp+=figura;
+                       figura="";
+                    }
+                    igrac += tmp;
+                    info += igrac;
+                    igrac = "";
+                    tmp="";
+
+                }
+                info+="\nUkupno vrijeme trajanja igre: "+gameTime.getText();
+    try {
+
+        Files.writeString(Paths.get("."+File.separator+"REZULTATI\\IGRA" + simpleDateFormat.format(new Date()) + ".txt"), info);
+    } catch (IOException ioException) {
+        GenLogger.log(Game.class, ioException);
+    }
+                System.out.println("File written successfully!");
+
+}
+}
+
 
 
 

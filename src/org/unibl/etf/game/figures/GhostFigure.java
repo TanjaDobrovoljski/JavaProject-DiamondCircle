@@ -4,6 +4,7 @@ import org.unibl.etf.game.cards.Deck;
 import org.unibl.etf.game.players.Player;
 import org.unibl.etf.shape.Diamond;
 import org.unibl.etf.shape.DiamondShape;
+import org.unibl.etf.tools.GenLogger;
 import org.unibl.etf.tools.Tuple;
 
 
@@ -24,6 +25,7 @@ public class GhostFigure extends Thread implements Serializable {
     private int matrixDimension,rand;
     private Set<Diamond> list=new HashSet<Diamond>();
     private DiamondShape d;
+    public static boolean pause = false;
 
     public GhostFigure(DiamondShape d)
     {
@@ -49,6 +51,7 @@ public class GhostFigure extends Thread implements Serializable {
 
     public void playGhost()
     {
+
         Random random = new Random();
         rand = 0;
         while (true){
@@ -71,10 +74,19 @@ public class GhostFigure extends Thread implements Serializable {
         list.clear();
     }
 
+
+
     @Override
     public  void  run() {
-        while(true)
-        {
+       while (true){
+
+           while(pause) {
+               try {
+                   Thread.sleep(1000);
+               } catch (InterruptedException e) {
+                   GenLogger.log(GhostFigure.class, e);
+               }
+           }
             try {
                 playGhost();
 
@@ -83,6 +95,6 @@ public class GhostFigure extends Thread implements Serializable {
             }catch (NullPointerException | InterruptedException ex) {
                 ex.printStackTrace();
             }
-        }
-    }
+
+    }}
 }

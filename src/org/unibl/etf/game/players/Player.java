@@ -44,6 +44,18 @@ public class Player implements Serializable {
         this.turn = turn;
     }
 
+    public String getColorName()
+    {
+        if(color.equals(Color.RED))
+            return "CRVENA";
+        else if(color.equals(Color.GREEN))
+            return "ZELENA";
+        else if(color.equals(Color.BLUE))
+            return "PLAVA";
+        else if(color.equals(Color.YELLOW))
+            return "ŽUTA";
+        return null;
+    }
 /*  static
     {
         try {
@@ -92,8 +104,8 @@ public class Player implements Serializable {
     private void extracted(Random random) {
         int rand;
         for (int i = 0; i < 4; i++) {
-           rand = random.nextInt(4);
-           //rand = 3;
+          rand = random.nextInt(4);
+          // rand = 2;
             if (rand == 1)
                 figures.add(new OrdinaryFigure(d, this));
             else if (rand == 2)

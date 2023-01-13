@@ -23,6 +23,7 @@ public class LevitatingFigure extends Figure implements levitationInterface{
     private ListIterator<Tuple<Integer, Integer>> tmp=null;
     private JTextField textField;
     private String textFigure="",tmpText="",tmpTextEnd="";
+    private static int diamondCounter=0;
 
     public LevitatingFigure(DiamondShape d, Player p)
     {
@@ -41,6 +42,8 @@ public class LevitatingFigure extends Figure implements levitationInterface{
         flagBeg=0;
         this.moves++;
         this.mov++;
+        diamondCounter++;
+        tmpMoves=moves-1;
     }
 
     public void setShape(StarShape shape) {
@@ -153,5 +156,9 @@ public class LevitatingFigure extends Figure implements levitationInterface{
                 e.printStackTrace();
             }
         }
+    }
+    @Override
+    public String toString() {
+        return super.toString()+" (lebdeća figura,";
     }
 }

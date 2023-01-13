@@ -11,7 +11,7 @@ public class GameDurationTimer  extends Thread{
     private String ddSeconds,ddMinutes;
     private DecimalFormat dFormat=new DecimalFormat("00");
     private Game g;
-    private boolean paused = false;
+    public static  boolean paused = false;
 
     public GameDurationTimer(Game g)
     {
@@ -20,19 +20,35 @@ public class GameDurationTimer  extends Thread{
         this.g=g;
     }
 
+    public String getDdSeconds() {
+        return ddSeconds;
+    }
+
+    public void setDdSeconds(String ddSeconds) {
+        this.ddSeconds = ddSeconds;
+    }
+
+    public String getDdMinutes() {
+        return ddMinutes;
+    }
+
+    public void setDdMinutes(String ddMinutes) {
+        this.ddMinutes = ddMinutes;
+    }
+
     @Override
     public  void run()
     {
         while (true)
         {
-            if (paused)
-            {
+            while(paused) {
                 try {
-                    this.wait();
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    GenLogger.log(GameDurationTimer.class, e);
                 }
             }
+
             second++;
             ddSeconds=dFormat.format(second);
             ddMinutes=dFormat.format(minute);

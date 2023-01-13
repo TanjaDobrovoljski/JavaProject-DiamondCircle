@@ -7,6 +7,7 @@ import org.unibl.etf.tools.UnavaliableNameException;
 import javax.swing.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -24,8 +25,9 @@ public class Application  {
     private JLabel player3;
     private JLabel player4;
     private JPanel mainPanel;
-    private List<String> startingNiz = new ArrayList<>();
+    private static List<String> startingNiz = new ArrayList<>();
     int numOfPlayers=0;
+
 
 
     public static void main(String args[]) {
@@ -84,8 +86,9 @@ public class Application  {
 
 
             try {
+                Collections.shuffle(application.startingNiz);
                 new Game(application.startingNiz);
-            } catch (UnavaliableNameException e) {
+            } catch (UnavaliableNameException | IOException e) {
                 GenLogger.log(Application.class, e);
                 JOptionPane.showMessageDialog(frame, e.getMessage(), "Greška", JOptionPane.ERROR_MESSAGE);
                 System.exit(0);
@@ -96,6 +99,5 @@ public class Application  {
         }});
     }
 
-
-
 }
+

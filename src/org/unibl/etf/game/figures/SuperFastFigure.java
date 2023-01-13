@@ -168,4 +168,8 @@ public class SuperFastFigure extends Figure {
             }
         }
     }
+    @Override
+    public String toString() {
+        return super.toString()+" (super-brza figura,";
+    }
 }

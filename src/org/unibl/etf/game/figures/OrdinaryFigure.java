@@ -42,6 +42,7 @@ public class OrdinaryFigure extends Figure {
         flagBeg=0;
         this.moves++;
         this.mov++;
+        tmpMoves=moves-1;
     }
 
     public void setMoves(int moves) {
@@ -161,5 +162,11 @@ public class OrdinaryFigure extends Figure {
         }
 
 
-    }}
+    }
+    @Override
+    public String toString() {
+        return super.toString()+" (obična figura,";
+    }
+
+}
 
