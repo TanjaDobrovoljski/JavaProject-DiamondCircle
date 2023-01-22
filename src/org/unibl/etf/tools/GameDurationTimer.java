@@ -62,7 +62,7 @@ public class GameDurationTimer  extends Thread{
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                GenLogger.log(GameDurationTimer.class,e);
             }
         }
         }

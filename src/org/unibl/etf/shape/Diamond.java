@@ -3,8 +3,9 @@ package org.unibl.etf.shape;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.Serializable;
 
-public final class Diamond extends JPanel {
+public final class Diamond extends JPanel implements Serializable {
     private Integer positionX;
     private Integer positionY;
     private static String diamondImage; //slicica

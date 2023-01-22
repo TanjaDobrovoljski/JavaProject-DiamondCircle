@@ -76,27 +76,29 @@ public class Application  {
             if(numOfPlayers.get()<2){
                 try {
                     throw  new NotEnoughArguments();
+
                 } catch (NotEnoughArguments e) {
                     GenLogger.log(Application.class, e);
                     JOptionPane.showMessageDialog(frame, e.getMessage(), "Greška", JOptionPane.ERROR_MESSAGE);
 
                 }
+
             }
             else {
 
 
-            try {
                 Collections.shuffle(application.startingNiz);
-                new Game(application.startingNiz);
-            } catch (UnavaliableNameException | IOException e) {
-                GenLogger.log(Application.class, e);
-                JOptionPane.showMessageDialog(frame, e.getMessage(), "Greška", JOptionPane.ERROR_MESSAGE);
-                System.exit(0);
 
-            }
+                try {
+                    new Game(application.startingNiz);
+                } catch (UnavaliableNameException e) {
+                    GenLogger.log(Application.class,e);
+                    JOptionPane.showMessageDialog(frame, e.getMessage(), "Greška", JOptionPane.ERROR_MESSAGE);
+                    System.exit(0);
+                }
 
 
-        }});
+            }});
     }
 
 }

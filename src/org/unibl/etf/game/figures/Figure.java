@@ -159,5 +159,5 @@ public abstract class Figure  implements Serializable {
         return "Figura "+uniqueID;
     }
 
-    public abstract void makeMove() throws InterruptedException;
+    public abstract void makeMove() ;
 }

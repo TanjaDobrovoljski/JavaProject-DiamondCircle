@@ -5,8 +5,9 @@ import javax.swing.*;
 import static sample.Game.playField;
 import java.awt.*;
 import java.io.File;
+import java.io.Serializable;
 
-public class Hole extends JPanel {
+public final class Hole extends JPanel  implements Serializable {
     private Integer positionX;
     private Integer positionY;
     private static File file=new File("src/sample");

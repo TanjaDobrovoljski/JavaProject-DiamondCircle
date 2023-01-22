@@ -4,6 +4,7 @@ import org.unibl.etf.game.cards.Deck;
 import org.unibl.etf.game.cards.SpecialCard;
 import org.unibl.etf.game.players.Player;
 import org.unibl.etf.shape.DiamondShape;
+import org.unibl.etf.tools.GenLogger;
 import org.unibl.etf.tools.Tuple;
 import sample.Game;
 
@@ -58,7 +59,7 @@ public class OrdinaryFigure extends Figure {
     }
 
     @Override
-    public  void makeMove() throws InterruptedException { //ova metoda moze u figuru,pa da se samo za svaki child overriduje koliko prelazi
+    public  void makeMove()  { //ova metoda moze u figuru,pa da se samo za svaki child overriduje koliko prelazi
         flagBeg = 0; flagEnd=0;
         flagFirstMovement=0;
         Tuple<Integer, Integer> last_move = null;
@@ -155,7 +156,7 @@ public class OrdinaryFigure extends Figure {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                GenLogger.log(OrdinaryFigure.class,e);
             }
 
 

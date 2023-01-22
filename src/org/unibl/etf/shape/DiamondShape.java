@@ -23,7 +23,7 @@ import javax.swing.table.TableColumnModel;
 import static sample.Game.playField;
 
 
-public class DiamondShape implements Serializable {
+public final class DiamondShape implements Serializable {
 
    private static JButton[][] buttons;
     private static   List<Tuple<Integer, Integer>> movementsOdd; //neparni

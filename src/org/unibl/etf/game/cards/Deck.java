@@ -2,6 +2,7 @@ package org.unibl.etf.game.cards;
 
 import org.unibl.etf.shape.DiamondShape;
 import org.unibl.etf.tools.CircularArrayList;
+import org.unibl.etf.tools.GenLogger;
 
 import java.nio.Buffer;
 import java.util.*;
@@ -44,7 +45,7 @@ public class Deck{
         this.holeFlag = holeFlag;
     }
 
-    public  int drawCard() throws InterruptedException {
+    public  int drawCard() {
 
         if (numofDraw == deck.capacity()-1)
         { numofDraw = 0;
@@ -59,7 +60,11 @@ public class Deck{
             if(holeFlag==1)
 
             {
-                Thread.sleep(1000);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    GenLogger.log(Deck.class, e);
+                }
                 SpecialCard.getList().clear();
                 SpecialCard.removeHoles();
 
@@ -74,7 +79,11 @@ public class Deck{
             if(!SpecialCard.getList().isEmpty())
 
             {
-                Thread.sleep(1000);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    GenLogger.log(Deck.class, e);
+                }
                 SpecialCard.getList().clear();
                 SpecialCard.removeHoles();
 

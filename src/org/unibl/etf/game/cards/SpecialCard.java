@@ -30,7 +30,7 @@ public class SpecialCard extends Card{
         SpecialCard.list = list;
     }
 
-    public void setHoles() throws InterruptedException {
+    public void setHoles(){
 
         if(!list.isEmpty())
             list.clear();

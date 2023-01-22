@@ -67,7 +67,7 @@ public class GhostFigure extends Thread implements Serializable {
                 list.add(new Diamond(element.getItem1(), element.getItem2()));
                 tmpRand--;
             } catch (NullPointerException ex) {
-                ex.printStackTrace();
+                GenLogger.log(GhostFigure.class,ex);
             }
         }
        list.stream().forEach(diamond -> DiamondShape.getButtons()[diamond.getPositionX()][diamond.getPositionY()].add(diamond));
@@ -93,7 +93,7 @@ public class GhostFigure extends Thread implements Serializable {
                 Thread.sleep(5000);
                 this.getD().removeDiamonds();
             }catch (NullPointerException | InterruptedException ex) {
-                ex.printStackTrace();
+                GenLogger.log(GhostFigure.class,ex);
             }
 
     }}

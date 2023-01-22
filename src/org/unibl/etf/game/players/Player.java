@@ -23,7 +23,7 @@ import sample.Game;
 import static sample.Game.figureCoordinates;
 import static sample.Game.playingDeck;
 
-public class Player implements Serializable {
+public final class Player implements Serializable {
     public static final Set<String> names = new HashSet<String>();
 
     private String name;
@@ -56,24 +56,15 @@ public class Player implements Serializable {
             return "ŽUTA";
         return null;
     }
-/*  static
-    {
-        try {
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("IGRA_"+ LocalDate.now()+".txt"));
-            bufferedWriter.write("");
-            bufferedWriter.close();
-        }
-        catch (IOException ioException){
-            GenLogger.log(Player.class, ioException);
-        }
-    }*/
+
 
     public Player(String name, DiamondShape d) throws UnavaliableNameException {
         this.d = d;
 
        if ( !"".equals(name) && !" ".equals(name) )
            if(!names.add(name))
-          throw new UnavaliableNameException();
+               throw new UnavaliableNameException();
+
         this.name = name;
         uniqueID = idCounter;
 
@@ -195,7 +186,7 @@ public class Player implements Serializable {
         this.figuresFinishedGame = figuresFinishedGame;
     }
 
-    public void playing() throws IOException, InterruptedException {
+    public void playing() {
 
             if (figureNumber < 4 && figures.get(figureNumber).isFIgureAlive())
             {
@@ -227,7 +218,8 @@ public class Player implements Serializable {
 
 
 
-    public void figureOnHole() throws InterruptedException {
+    public void figureOnHole()
+    {
         if (figureNumber==4)
             figureNumber=3;
         if(figures.get(figureNumber).getPassedMovements().size()!=0 && !((figures.get(figureNumber)) instanceof levitationInterface))

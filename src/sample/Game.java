@@ -97,8 +97,10 @@ public class Game extends JFrame implements Serializable {
     }
 
 
-    public Game( List<String> niz) throws UnavaliableNameException, IOException {
+    public Game( List<String> niz) throws UnavaliableNameException {
+
         super();
+
         setContentPane(mainPanel);
         setVisible(true);
         pack();
@@ -109,16 +111,20 @@ public class Game extends JFrame implements Serializable {
         showFilesButton.setEnabled(false);
 
         if(niz.size()>=2){
-            editorPane1.setText("Trenutni broj\nodigranih igara je: "+String.valueOf(Files.walk(Paths.get("."+ File.separator+"REZULTATI"))
-                    .filter(p -> p.toString().endsWith(".txt"))
-                    .count()));
+            try {
+                editorPane1.setText("Trenutni broj\nodigranih igara je: " + String.valueOf(Files.walk(Paths.get("." + File.separator + "REZULTATI"))
+                        .filter(p -> p.toString().endsWith(".txt"))
+                        .count()));
+            }catch (IOException e)
+            {
+                GenLogger.log(Game.class,e);
+            }
             isPaused=new AtomicBoolean(false);
             playField = middle;
             DiamondShape d = new DiamondShape();
             startingNiz=new ArrayList<>();
             numOfPlayers = niz.size();
-            GhostFigure g = new GhostFigure(d);
-            g.start();
+
 
             for (int i=0;i<niz.size();i++)
             {
@@ -141,6 +147,8 @@ public class Game extends JFrame implements Serializable {
                 }
             }
 
+            GhostFigure g = new GhostFigure(d);
+            g.start();
         Deck deck = new Deck();
         playingDeck = deck;
         text = moveDescription;
@@ -163,7 +171,7 @@ public class Game extends JFrame implements Serializable {
                    try {
                        new FigurePath(list1.getSelectedValue());
                    } catch (InterruptedException interruptedException) {
-                       interruptedException.printStackTrace();
+                       GenLogger.log(Game.class,interruptedException);
                    }
                }
             }
@@ -197,23 +205,14 @@ public class Game extends JFrame implements Serializable {
                                         .filter(p -> p.toString().endsWith(".txt"))
                                         .count()));
                                 showFilesButton.setEnabled(true);
+                                pauseButton.setEnabled(false);
                             } catch (IOException e) {
-                                e.printStackTrace();
+                                GenLogger.log(Game.class,e);
                             }
                         }
                 }},0,1000);
 
 
-
-        // gameTimer.stop();
-
-
-       /* if (finishingNiz.size() != 0) {
-            int i = 1;
-            for (Player p : finishingNiz) {
-                System.out.println(i + " mjesto: " + p.toString());
-            }
-        }*/
 
         pauseButton.addActionListener(new ActionListener() {
             @Override
@@ -224,9 +223,6 @@ public class Game extends JFrame implements Serializable {
                 GameDurationTimer.paused=true;
                 pauseButton.setEnabled(false);
                 continueButton.setEnabled(true);
-
-
-
             }});
 
         continueButton.addActionListener(new ActionListener() {
@@ -252,20 +248,27 @@ public class Game extends JFrame implements Serializable {
                     new FileListForm(Paths.get("."+ File.separator+"REZULTATI"));
 
                 } catch (IOException ioException) {
-                    ioException.printStackTrace();
+                    GenLogger.log(Game.class,ioException);
                 }
             }
         });
     }
 
 
-    public void slika(Card s) throws IOException, InterruptedException {
+    public void slika(Card s)  {
         imagePanel.setLayout(new FlowLayout());
         BufferedImage myPicture = null;
-        myPicture = ImageIO.read(new File(s.getSlika()));
-        imageLabel.setIcon(new ImageIcon(myPicture));
-        if (s instanceof SpecialCard)
-            Thread.sleep(1000);
+        try {
+            myPicture = ImageIO.read(new File(s.getSlika()));
+            imageLabel.setIcon(new ImageIcon(myPicture));
+            if (s instanceof SpecialCard)
+                Thread.sleep(1000);
+        }catch (IOException | InterruptedException e)
+        {
+            GenLogger.log(Game.class,e);
+        }
+
+
     }
 
 
@@ -279,38 +282,47 @@ public class Game extends JFrame implements Serializable {
             currentPlayer = 0;
 
                 while(currentPlayer < startingNiz.size() && !isPaused.get()){
+                    if(GhostFigure.pause==true && GameDurationTimer.paused==true)
+                    {
+                        GhostFigure.pause=false;
+                        GameDurationTimer.paused=false;
+                    }
                 if (!(lostNiz.contains(startingNiz.get(currentPlayer))) && startingNiz.get(currentPlayer).isPlayerInTheGame()) {
-                    try {
-                        slika(playingDeck.image());
-                        text.setText("Na potezu je " + startingNiz.get(currentPlayer).toString() + ", ");
-                        startingNiz.get(currentPlayer).playing();
+                    slika(playingDeck.image());
+                    text.setText("Na potezu je " + startingNiz.get(currentPlayer).toString() + ", ");
+                    startingNiz.get(currentPlayer).playing();
 
-                        if (!SpecialCard.getList().isEmpty()) {
+                    if (!SpecialCard.getList().isEmpty()) {
 
-                            for (Player p : startingNiz) {
-                                p.figureOnHole();
-                            }
-
-
+                        for (Player p : startingNiz) {
+                            p.figureOnHole();
                         }
 
-                        currentPlayer++;
-                    } catch (IOException ioException) {
-                        ioException.printStackTrace();
-                    } catch (InterruptedException interruptedException) {
-                        interruptedException.printStackTrace();
+
                     }
+
+                    currentPlayer++;
                 } else {
                     if (startingNiz.get(currentPlayer).getFiguresFinishedGame() == 4)
-                        if (!finishingNiz.contains(startingNiz.get(currentPlayer)))
+                        if (!finishingNiz.contains(startingNiz.get(currentPlayer))) {
                             finishingNiz.add(startingNiz.get(currentPlayer));
+                            pause();
+                            GhostFigure.pause=true;
+                            GameDurationTimer.paused=true;
+                            JOptionPane.showMessageDialog(this, startingNiz.get(currentPlayer).toString()+" su sve figure stigle do cilja!", "Obavijest", JOptionPane.INFORMATION_MESSAGE);
+                           }
 
                     if (!lostNiz.contains(startingNiz.get(currentPlayer))) {
                         lostNiz.add(startingNiz.get(currentPlayer));
                         numOfPlayers--;
-                    }
+                        pause();
+                        GhostFigure.pause=true;
+                        GameDurationTimer.paused=true;
+                        JOptionPane.showMessageDialog(this, startingNiz.get(currentPlayer).toString()+" više nije u igri!", "Obavijest", JOptionPane.INFORMATION_MESSAGE);
+}
                     currentPlayer++;
                 }
+                resume();
             }
 
         }
@@ -318,7 +330,7 @@ public class Game extends JFrame implements Serializable {
 
 }
 
-public void writeInFIle() throws IOException {
+public void writeInFIle() {
     timer.cancel();
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("-HH_mm_ss_dd.MM.yyyy");
